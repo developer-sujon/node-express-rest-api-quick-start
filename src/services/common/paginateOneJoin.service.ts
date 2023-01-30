@@ -2,13 +2,7 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
-const paginateOneJoinService = async (
-  request: any,
-  dataModel: any,
-  searchArray: any,
-  projection: {},
-  joinStageOne: {}
-) => {
+const paginateOneJoinService = async (request: any, dataModel: any, searchArray: any, projection: {}, joinStageOne: {}) => {
   const proprietor = request.proprietor;
   const store = request.store;
   const searchKeyword = request.params.searchKeyword;
@@ -31,12 +25,7 @@ const paginateOneJoinService = async (
       {
         $facet: {
           total: [{ $count: 'count' }],
-          data: [
-            { $skip: skipRow },
-            { $sort: { _id: -1 } },
-            { $limit: perPage },
-            projection,
-          ],
+          data: [{ $skip: skipRow }, { $sort: { _id: -1 } }, { $limit: perPage }, projection],
         },
       },
     ]);
@@ -52,12 +41,7 @@ const paginateOneJoinService = async (
       {
         $facet: {
           total: [{ $count: 'count' }],
-          data: [
-            { $skip: skipRow },
-            { $sort: { _id: -1 } },
-            { $limit: perPage },
-            projection,
-          ],
+          data: [{ $skip: skipRow }, { $sort: { _id: -1 } }, { $limit: perPage }, projection],
         },
       },
     ]);

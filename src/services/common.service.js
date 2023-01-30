@@ -4,15 +4,19 @@ const httpStatus = require('http-status');
 //Internal Lib Import
 const ApiError = require('../utils/ApiError');
 
-const createService = async (dataModel, unique, uniqueValue, errorMessage, postBody) => {
+const createService = async (dataModel, unique, uniqueValue, errorMessage, postBody, session) => {
   const uniqueData = await dataModel.aggregate([{ $match: uniqueValue }]);
 
   if (unique && uniqueData.length > 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, errorMessage);
   }
-
   const data = new dataModel(postBody);
-  return await data.save();
+
+  if (session) {
+    return await data.save({ session });
+  } else {
+    return await data.save();
+  }
 };
 
 const listService = async (dataModel, matchQuery, projection) => {
@@ -34,6 +38,23 @@ const listOneJoinService = async (dataModel, matchQuery, joinStage, projection) 
     },
     projection,
   ]);
+};
+
+const detailsService = async (dataModel, matchQuery, projection) => {
+  return await dataModel.aggregate([
+    matchQuery,
+    {
+      $sort: { _id: -1 },
+    },
+    projection,
+  ]);
+};
+
+const detailsJoinService = async (dataModel, matchQuery, joinStage, projection, replaceProperty) => {
+  if (replaceProperty) {
+    return await dataModel.aggregate([matchQuery, joinStage, replaceProperty, projection]);
+  }
+  return await dataModel.aggregate([matchQuery, joinStage, projection]);
 };
 
 const updateService = async (dataModel, matchQuery, postBody, errorMessage) => {
@@ -60,6 +81,8 @@ module.exports = {
   createService,
   listService,
   listOneJoinService,
+  detailsService,
+  detailsJoinService,
   updateService,
   deleteService,
 };

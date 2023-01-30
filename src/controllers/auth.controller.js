@@ -1,18 +1,49 @@
+const mongoose = require('mongoose');
+
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { authService, userService, tokenService, emailService } = require('../services');
+const { authService, userService, tokenService, emailService, commonService } = require('../services');
+const { Proprietor, Store } = require('../models');
 
-const register = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
-});
+const register = async (req, res, next) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+    const proprietorCreate = await commonService.createService(Proprietor, false, {}, null, req.body, session);
+    const storeCreate = await commonService.createService(
+      Store,
+      false,
+      {},
+      null,
+      {
+        ...req.body,
+        proprietorID: proprietorCreate._id,
+      },
+      session
+    );
+
+    const user = await userService.createUser(
+      { proprietorID: proprietorCreate._id, storeID: storeCreate._id, ...req.body },
+      session
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(httpStatus.CREATED).send({ message: req.t('Registration Successful') });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    next(error);
+  }
+};
 
 const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await authService.loginUserWithEmailAndPassword(email, password);
+  const { mobile, password } = req.body;
+  const user = await authService.loginUserWithMobileAndPassword(mobile, password);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ user, tokens });
+  res.send({ tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
@@ -21,7 +52,7 @@ const logout = catchAsync(async (req, res) => {
 });
 
 const refreshTokens = catchAsync(async (req, res) => {
-  const tokens = await authService.refreshAuth(req.body.refreshToken);
+  const tokens = await authService.refreshAuth(req.params.refreshToken);
   res.send({ ...tokens });
 });
 

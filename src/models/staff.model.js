@@ -8,6 +8,11 @@ const permissions = require('../config/permissions');
 
 const staffSchema = new mongoose.Schema(
   {
+    userID: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: 'staff',
+    },
     name: {
       type: String,
       required: true,

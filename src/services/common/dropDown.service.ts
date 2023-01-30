@@ -2,11 +2,7 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
-const dropDownService = async (
-  request: any,
-  dataModel: any,
-  projection: object
-) => {
+const dropDownService = async (request: any, dataModel: any, projection: object) => {
   const proprietor = request.proprietor;
   const store = request.store;
 

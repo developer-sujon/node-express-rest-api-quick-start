@@ -3,18 +3,28 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const { toJSON, paginate } = require('./plugins');
-const { roles } = require('../config/roles');
 
 const userSchema = mongoose.Schema(
   {
-    userCode: {
-      type: String,
+    proprietorID: {
+      type: mongoose.Types.ObjectId,
       required: true,
+      ref: 'Proprietor',
     },
-    name: {
+    storeID: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: 'Store',
+    },
+    mobile: {
       type: String,
       required: true,
-      trim: true,
+      unique: true,
+      validate(value) {
+        if (!value.match('^(?:\\+88|88)?(01[3-9]\\d{8})$')) {
+          throw new Error('Please enter the correct number');
+        }
+      },
     },
     email: {
       type: String,
@@ -42,17 +52,8 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: roles,
-      default: 'user',
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'active', 'rejected'],
-      default: 'active',
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
+      required: true,
+      default: 'proprietor',
     },
   },
   {
@@ -73,6 +74,17 @@ userSchema.plugin(paginate);
  */
 userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  return !!user;
+};
+
+/**
+ * Check if mobile is taken
+ * @param {string} mobile - The user's mobile
+ * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
+ * @returns {Promise<boolean>}
+ */
+userSchema.statics.isMobileTaken = async function (mobile, excludeUserId) {
+  const user = await this.findOne({ mobile, _id: { $ne: excludeUserId } });
   return !!user;
 };
 

@@ -2,11 +2,7 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
-const listQueryService = async (
-  request: any,
-  dataModel: any,
-  matchQuery: any
-) => {
+const listQueryService = async (request: any, dataModel: any, matchQuery: any) => {
   matchQuery.proprietorId = new ObjectId(request.proprietorId);
   matchQuery.storeId = new ObjectId(request.storeId);
 

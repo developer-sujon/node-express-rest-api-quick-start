@@ -16,10 +16,7 @@ const deleteService = async (request: any, dataModel: any) => {
   });
 
   if (!data) {
-    throw new CustomError(
-      httpStatus.BAD_REQUEST,
-      `${dataModel.collection.collectionName} Not Found`
-    );
+    throw new CustomError(httpStatus.BAD_REQUEST, `${dataModel.collection.collectionName} Not Found`);
   }
   await dataModel.deleteMany({ customerId: deleteId, proprietorId, storeId });
 

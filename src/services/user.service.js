@@ -7,13 +7,22 @@ const ApiError = require('../utils/ApiError');
  * @param {Object} userBody
  * @returns {Promise<User>}
  */
-const createUser = async (userBody) => {
+const createUser = async (userBody, session) => {
+  userBody.password = 'pass1234';
+
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  return User.create(userBody);
-};
+  if (await User.isMobileTaken(userBody.mobile)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile already taken');
+  }
 
+  if (session) {
+    return new User(userBody).save({ session });
+  } else {
+    return User.create(userBody);
+  }
+};
 
 /**
  * Query for users
@@ -45,6 +54,15 @@ const getUserById = async (id) => {
  */
 const getUserByEmail = async (email) => {
   return User.findOne({ email });
+};
+
+/**
+ * Get user by mobile
+ * @param {string} mobile
+ * @returns {Promise<User>}
+ */
+const getUserByMobile = async (mobile) => {
+  return User.findOne({ mobile });
 };
 
 /**
@@ -85,6 +103,7 @@ module.exports = {
   queryUsers,
   getUserById,
   getUserByEmail,
+  getUserByMobile,
   updateUserById,
   deleteUserById,
 };

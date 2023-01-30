@@ -5,11 +5,7 @@ const ObjectId = mongoose.Types.ObjectId;
 //Internal Lib Import
 import shuffleArray from '../../../helpers/shuffleArray';
 
-const listShuffleService = async (
-  request: any,
-  dataModel: any,
-  matchQuery: any
-) => {
+const listShuffleService = async (request: any, dataModel: any, matchQuery: any) => {
   matchQuery.proprietor = new ObjectId(request.proprietor);
   matchQuery.store = new ObjectId(request.store);
 

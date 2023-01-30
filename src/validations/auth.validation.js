@@ -1,19 +1,26 @@
 const Joi = require('joi');
-const { password } = require('./custom.validation');
+const { password, mobile } = require('./custom.validation');
 
 const register = {
   body: Joi.object().keys({
-    userCode: Joi.string().required(),
+    storeName: Joi.string().min(3).max(50).required(),
+    name: Joi.string().min(3).max(30).required(),
+    mobile: Joi.string().required().custom(mobile),
     email: Joi.string().required().email(),
-    password: Joi.string().required().custom(password),
-    name: Joi.string().required(),
+    address: Joi.string().min(3).max(100).required(),
+    district: Joi.string().min(3).max(30).required(),
+    thana: Joi.string().min(3).max(30).required(),
+    reference: Joi.object({
+      name: Joi.string().min(3).max(30).required(),
+      mobile: Joi.string().required().custom(mobile),
+    }),
   }),
 };
 
 const login = {
   body: Joi.object().keys({
-    email: Joi.string().required(),
-    password: Joi.string().required(),
+    mobile: Joi.string().required().custom(mobile),
+    password: Joi.string().required().custom(password),
   }),
 };
 
@@ -24,7 +31,7 @@ const logout = {
 };
 
 const refreshTokens = {
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     refreshToken: Joi.string().required(),
   }),
 };

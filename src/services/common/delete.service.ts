@@ -8,10 +8,7 @@ const deleteService = async (matchQuery: any, dataModel: any) => {
   const data = await dataModel.findOne(matchQuery);
 
   if (!data) {
-    throw new CustomError(
-      httpStatus.BAD_REQUEST,
-      `${dataModel.collection.collectionName} Not Found`
-    );
+    throw new CustomError(httpStatus.BAD_REQUEST, `${dataModel.collection.collectionName} Not Found`);
   }
   return await dataModel.deleteMany(matchQuery);
 };

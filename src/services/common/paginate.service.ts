@@ -2,11 +2,7 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
-const paginateService = async (
-  request: any,
-  dataModel: any,
-  searchArray: object[]
-) => {
+const paginateService = async (request: any, dataModel: any, searchArray: object[]) => {
   const proprietor = request.proprietor;
   const store = request.store;
   const searchKeyword = request.params.searchKeyword;
@@ -28,11 +24,7 @@ const paginateService = async (
       {
         $facet: {
           total: [{ $count: 'count' }],
-          data: [
-            { $sort: { _id: -1 } },
-            { $skip: skipRow },
-            { $limit: perPage },
-          ],
+          data: [{ $sort: { _id: -1 } }, { $skip: skipRow }, { $limit: perPage }],
         },
       },
     ]);
@@ -47,11 +39,7 @@ const paginateService = async (
       {
         $facet: {
           total: [{ $count: 'count' }],
-          data: [
-            { $sort: { _id: -1 } },
-            { $skip: skipRow },
-            { $limit: perPage },
-          ],
+          data: [{ $sort: { _id: -1 } }, { $skip: skipRow }, { $limit: perPage }],
         },
       },
     ]);

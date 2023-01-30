@@ -6,12 +6,7 @@ import CustomError from '../../helpers/CustomError';
 import detailsService from './details.service';
 import StoreModel from '../../models/Store.model';
 
-const createService = async (
-  request: any,
-  dataModel: any,
-  unique: boolean,
-  uniqueValue: any
-) => {
+const createService = async (request: any, dataModel: any, unique: boolean, uniqueValue: any) => {
   const matchQuery = {
     $match: {
       storeUserName: request.body.storeUserName,
@@ -33,10 +28,7 @@ const createService = async (
   const uniqueData = await dataModel.aggregate([{ $match: uniqueValue }]);
 
   if (unique && uniqueData.length > 0) {
-    throw new CustomError(
-      httpStatus.BAD_REQUEST,
-      `${dataModel.collection.collectionName} already created`
-    );
+    throw new CustomError(httpStatus.BAD_REQUEST, `${dataModel.collection.collectionName} already created`);
   }
 
   const data = new dataModel(request.body);

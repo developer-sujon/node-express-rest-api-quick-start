@@ -27,7 +27,7 @@ const errorHandler = (err, req, res, next) => {
 
   const response = {
     code: statusCode,
-    message,
+    message: req.t(message),
     ...(config.env === 'development' && { stack: err.stack }),
   };
 
