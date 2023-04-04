@@ -4,15 +4,15 @@ const httpStatus = require('http-status');
 //Internal Lib Import
 const ApiError = require('../../utils/ApiError');
 
-const createService = async (dataModel, unique, uniqueValue, errorMessage, postBody) => {
-  const uniqueData = await dataModel.aggregate([{ $match: uniqueValue }]);
+const createUniqueService = async (dataModel, uniqueValue, uniqueErorMessage, postBody) => {
+  const uniqueData = await dataModel.findOne(uniqueValue);
 
-  if (unique && uniqueData.length > 0) {
-    throw new ApiError(httpStatus.BAD_REQUEST, errorMessage);
+  if (uniqueData && Object.entries(uniqueData).length > 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, uniqueErorMessage);
   }
-
-  const data = new dataModel(postBody);
-  return await data.save();
+  return await new dataModel(postBody).save();
 };
 
-module.export = createService;
+module.exports = {
+  createUniqueService,
+};

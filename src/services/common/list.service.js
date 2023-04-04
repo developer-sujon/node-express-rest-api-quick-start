@@ -1,19 +1,10 @@
-//External Lib Import
-const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
-
-const listService = async (request, dataModel) => {
-  const proprietorId = request.proprietorId;
-  const storeId = request.storeId;
-
-  return await dataModel.aggregate([
-    {
-      $match: {
-        proprietorId: new ObjectId(proprietorId),
-        storeId: new ObjectId(storeId),
-      },
+const listService = async (dataModel, matchQuery, projection, sort) => {
+  sort = sort || {
+    $sort: {
+      _id: -1,
     },
-  ]);
+  };
+  return await dataModel.aggregate([matchQuery, projection, sort]);
 };
 
 module.exports = listService;
